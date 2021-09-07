@@ -50,9 +50,9 @@ A folder will be create inside output path selected (dirname) where result of co
 
 	- images (.png)
 	- analysissummary.txt
-        - dataquality.txt
-        - output.html 
-        - output.pdf
+	- dataquality.txt
+	- output.html 
+	- output.pdf
 
 
 
