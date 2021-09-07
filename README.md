@@ -35,28 +35,28 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 
 ## INPUT
 
-### REQUIREMENT INPUTS:
-        - dirname: output path to store results (path)
-        - dicompath: path to find dicom file/s (path)
-        - starttime: start time point to begin analysis (int)
-        - sliceshift: shift from center axial slice (int)
+### REQUIREMENT INPUTS
+- dirname: output path to store results (path)
+- dicompath: path to find dicom file/s (path)
+- starttime: start time point to begin analysis (int)
+- sliceshift: shift from center axial slice (int)
 
-### OPTIONAL INPUTS:
-        - shimmingfilename (optional): name of shimming file nii (string)
-        - noshimmingfilename (optional): name of no-shimming file nii (string)
-        - initxcenter (optional): xcenter (int)
-        - initycenter (optional): ycenter (int)
-        - initzcenter (optional): zcenter (int)
+### OPTIONAL INPUTS
+- shimmingfilename (optional): name of shimming file nii (string)
+- noshimmingfilename (optional): name of no-shimming file nii (string)
+- initxcenter (optional): xcenter (int)
+- initycenter (optional): ycenter (int)
+- initzcenter (optional): zcenter (int)
 
 ## OUTPUT
 
 A folder will be create on the selected output path (dirname) and result of computation will be stored inside:
 
-	- images (.png)
-	- analysissummary.txt
-	- dataquality.txt
-	- output.html 
-	- output.pdf
+- images (.png)
+- analysissummary.txt
+- dataquality.txt
+- output.html 
+- output.pdf
 
 
 
