@@ -47,6 +47,7 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 ## OUTPUT
 
 A folder will be create inside output path selected (dirname) where result of computation will be stored:
+
 	- images (.png)
 	- analysissummary.txt
         - dataquality.txt
