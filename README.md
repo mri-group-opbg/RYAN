@@ -29,15 +29,15 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 3) Launch command:
         ex. -> python path_git_folder/script/stabilitycalc.py "outputpath" "dicompath" 1 0 "shimmingfile.nii" "noshimmingfile.nii" ...
 
-##INPUT
+## INPUT
 
-## REQUIREMENT INPUTS:
+# REQUIREMENT INPUTS:
         - dirname: output path to store results (path)
         - dicompath: path to find dicom file/s (path)
         - starttime: start time point to begin analysis (int)
         - sliceshift: shift from center axial slice (int)
 
-##OPTIONAL INPUTS:
+# OPTIONAL INPUTS:
         - shimmingfilename (optional): name of shimming file nii (string)
         - noshimmingfilename (optional): name of no-shimming file nii (string)
         - initxcenter (optional): xcenter (int)
