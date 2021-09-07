@@ -27,7 +27,7 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 	- shimming file (if used) should contain "shimming" in its name 
 	- no shimming file (if used) should contain "no_shimming" in its name
 3) Launch command:
-        ex -> python path_git_folder/script/stabilitycalc.py "outputpath" "dicompath" 1 0 "shimmingfile.nii" "noshimmingfile.nii" ...
+	ex -> python path_git_folder/script/stabilitycalc.py "outputpath" "dicompath" 1 0 "shimmingfile.nii" "noshimmingfile.nii" ...
 
 ## INPUT
 
