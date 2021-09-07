@@ -23,11 +23,11 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 1) Clone GitFolder
 1) Create an input folder and a subfolder named "nii". Copy one dicom acquisition file inside input folder and copy nifti files inside "nii" subfolder
 2) Check nifti files' names: 
-	-acquisition file should contain "acquisition" in its name
-	-shimming file (if used) should contain "shimming" in its name 
+	- acquisition file should contain "acquisition" in its name
+	- shimming file (if used) should contain "shimming" in its name 
 	- no shimming file (if used) should contain "no_shimming" in its name
 3) Launch command:
-        ex. -> python path_git_folder/script/stabilitycalc.py "outputpath" "dicompath" 1 0 "shimmingfile.nii" "noshimmingfile.nii" ...
+        ex -> python path_git_folder/script/stabilitycalc.py "outputpath" "dicompath" 1 0 "shimmingfile.nii" "noshimmingfile.nii" ...
 
 ## INPUT
 
