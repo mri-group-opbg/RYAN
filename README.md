@@ -52,11 +52,12 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 
 A folder will be create on the selected output path (dirname) and result of computation will be stored inside:
 
-- images (.png)
-- analysissummary.txt
-- dataquality.txt
-- output.html 
-- output.pdf
+- dirname:
+	- images (.png)
+	- analysissummary.txt
+	- dataquality.txt
+	- output.html 
+	- output.pdf
 
 
 
