@@ -1,0 +1,25 @@
+<%include file="header.html" />
+<%include file="calculatedimages.html" />
+
+% if not isindividualcoil:
+    <%include file="central.html" />
+    <%include file="peripheral.html" />
+    <%include file="peripheralangle.html" />
+% endif
+
+% if isphasedarray:
+<%include file="phased.html" />
+% endif
+
+% if isindividualcoil:
+<%include file="individual.html" />
+% endif
+
+<%include file="ghost.html" />
+<%include file="spikes.html" />
+
+% if isshimming:
+    <%include file="shimming.html" />
+% endif
+
+<%include file="weisskoff.html" />

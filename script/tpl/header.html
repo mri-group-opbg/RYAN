@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<head>
+    <title>Stability report for ${info['Coil']} generated on ${thisdate}</title>
+    <style type="text/css">
+        h1 {
+            font-family: courier new;
+            text-decoration: underline;
+        }
+
+        body {
+               background-color: rgb(255, 255, 255);
+               font: 400 1em/1.38 Verdana;
+               color: rgb(25,25,112);
+        }
+
+        .text {
+               color: rgb(0,0,128);
+        }
+
+        h2 {
+            font-family: Verdana;
+            color: rgb (0,0,128);
+            text-decoration: underline;
+        }
+
+        h3 {
+            font-family: Verdana;
+            color: rgb (0,0,128);
+            text-decoration: none;
+        }
+
+        h4 {
+            font-family: Verdana;
+            text-decoration: none;
+        }
+
+        p {
+            font-family: Verdana;
+            color: rgb (0,0,128);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        td {
+            font-family: Verdana;
+            color: rgb (0,0,128);;
+            font-size: 12px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<p><a href="opbglogo.png"><IMG BORDER=0 SRC=opbglogo1.png width="350" align="right"></a></p>
+
+
+<body>
+<h2>Stability analysis of FUNSTAR from ${info['IRCCS']}</h2>
+% if info['Coil'] != '':
+<table rules="none" style="margin-center: 20px; text-align: left" border="0" width="700" cellpadding="2">
+    <tr>
+        <td style="font-size:20px">Coil:</td>
+        <td style="font-size:20px">${info['Coil']}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Element:</td>
+        <td style="font-size:20px">${info['ElementName']}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Acquisition Date:</td>
+        <td style="font-size:20px">${formatteddate}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Acquisition Time:</td>
+        <td style="font-size:20px">${formattedtime}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">IRCCS:</td>
+        <td style="font-size:20px">${info['IRCCS']}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Manufacturer:</td>
+        <td style="font-size:20px">${info['Manufacturer']}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Repetition Time (msec):</td>
+        <td style="font-size:20px">${tr*1000}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Echo Time (msec):</td>
+        <td style="font-size:20px">${info['EchoTime']}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Number of Volumes:</td>
+        <td style="font-size:20px">${selecteddata.shape[0]+1}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Pixel Bandwidth (Hz/Px):</td>
+        <td style="font-size:20px">${info['PixelBandwidth']}</td>
+    </tr>
+</table>
+% endif
+<table rules="none" style="margin-center: 20px; text-align: left" border="0" width="700" cellpadding="2">
+    <tr>
+        <td style="font-size:20px">Phantom center of mass:</td>
+        <td style="font-size:20px">${xcenterf},${ycenterf},${zcenterf}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Phantom type:</td>
+        <td style="font-size:20px">FUNSTAR Phantom</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Phantom mean radius:</td>
+        <td style="font-size:20px">${object_radius_mm}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Phantom shape factor:</td>
+        <td style="font-size:20px">${object_shape}</td>
+    </tr>
+    <tr>
+        <td style="font-size:20px">Imaging protocol: </td>
+        <td style="font-size:20px">BIRN stability</td>
+    </tr>
+</table>
+<!--- end of header --->

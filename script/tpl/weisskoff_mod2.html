@@ -1,0 +1,58 @@
+<table rules="none" style="margin-center: 20px; text-align: left" border="0" width="500" cellpadding="2">
+	<tr>
+        <td><p><a href="sagittal_weisskoffplot.png"><IMG BORDER=0 SRC=sagittal_weisskoffplot.png width="500"></a></p>
+        </td>
+        <td>
+            <small>
+                <table rules="none" style="margin-center: 20px; text-align: center" border="0" width="300"
+                       cellpadding="2">
+                    <tr>
+                        <th>Region Size</th>
+                        <th>Predicted Std Dev</th>
+                        <th>Actual Std Dev</th>
+                        <th>Ratio</th>
+                    </tr>
+                    % for i in range(sagittalroiareas.shape[0]):
+                    <tr>
+                        <td>${'%d' % sagittalroiareas[i]}</td>
+                        <td>${'%4.4f' % sagittalprojcvs[i]}</td>
+                        <td>${'%4.4f' % sagittalweisscvs[i]}</td>
+                        <td>${'%4.4f' % (sagittalweisscvs[i] / sagittalprojcvs[i])}</td>
+                    </tr>
+                    % endfor
+                </table>
+            </small>
+        </td>
+    </tr>
+    <tr>
+        <td><big><b>Sagittal RDC = ${sagittalweissrdc}</b></big></td>
+    </tr>
+	<tr>
+        <td><p><a href="cube_weisskoffplot.png"><IMG BORDER=0 SRC=cube_weisskoffplot.png width="500"></a></p>
+        </td>
+        <td>
+            <small>
+                <table rules="none" style="margin-center: 20px; text-align: center" border="0" width="300"
+                       cellpadding="2">
+                    <tr>
+                        <th>Region Size</th>
+                        <th>Predicted Std Dev</th>
+                        <th>Actual Std Dev</th>
+                        <th>Ratio</th>
+                    </tr>
+                    % for i in range(cuberoiareas.shape[0]):
+                    <tr>
+						<td>${'%d' % cuberoiareas[i]}</td>
+                        <td>${'%4.4f' % cubeprojcvs[i]}</td>
+                        <td>${'%4.4f' % cubeweisscvs[i]}</td>
+                        <td>${'%4.4f' % (cubeweisscvs[i] / cubeprojcvs[i])}</td>
+                    </tr>
+                    % endfor
+                </table>
+            </small>
+        </td>
+    </tr>
+    <tr>
+        <td><big><b>Cube RDC = ${cubeweissrdc}</b></big></td>
+    </tr>
+</table>

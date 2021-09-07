@@ -1,0 +1,28 @@
+<table rules="none" style="margin-center: 20px; text-align: left" border="0" width="500" cellpadding="2">
+    <hr>
+    <h3>Spikes Detection</h3>
+
+    <p>This is an analysis of spikes. Signal in a 5x5 corner ROI is evaluated within all the slices, for every repetition. The number of spikes detected for every repetition is then stored. </p>
+
+    <tr>
+        <td><p><a href="Spike_Detection.png"><IMG BORDER=0 SRC=Spike_Detection.png width="700"></a></p>
+        </td>
+        <td>
+            <small>
+                     <table rules="none" style="margin-center: 20px; text-align: center" border="0" width="300"
+                       cellpadding="0.5">
+                      <tr>
+                         <td># Slice</td>
+			 <td># Spikes Detected</td>
+                      </tr>
+                    % for i in indexslice:
+                      <tr>
+                         <td>${'%d' % numslice[i]}</td>
+                         <td>${'%4.4f' % peaks_nspk[i]}</td>
+                     </tr>
+                    % endfor
+                 </table>
+            </small>
+        </td>
+    </tr>
+</table>

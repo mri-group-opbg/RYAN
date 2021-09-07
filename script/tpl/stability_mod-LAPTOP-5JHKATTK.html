@@ -1,0 +1,52 @@
+<%include file="header.html" />
+<%include file="calculatedimages.html" />
+
+% if not isindividualcoil:
+	<div style = "display:block; clear:both; page-break-before: always;">
+    <%include file="central_mod.html" />
+	</div>
+	<br/>
+    <%include file="peripheral_mod.html" />
+	<br/>
+	<div style = "display:block; clear:both; page-break-before: always;">
+    <%include file="peripheralangle.html" />
+	</div>
+% endif
+
+% if isphasedarray:
+	<br/>
+	<%include file="phased.html" />
+% endif
+
+% if isindividualcoil:
+	<br/>
+	<%include file="individual.html" />
+% endif
+
+<div style = "display:block; clear:both; page-break-before: always; page-break-after:always;">
+<br/>
+<%include file="ghost.html" />
+<div>
+
+<!-- % if  -->
+	<!-- <div style = "display:block; clear:both; page-break-before: always; page-break-after:always;"> -->
+	<!-- <br/> -->
+	<!-- <%include file="spikes_mod.html" /> -->
+	<!-- <div> -->
+<!-- % endif -->
+ 
+<br/>
+<%include file="spikes_mod.html" />
+
+% if isshimming:
+	<div style = "display:block; clear:both; page-break-before: always; page-break-after:always;">
+    <%include file="shimming.html" />
+	</div>
+% endif
+
+<div style = "display:block; clear:both; page-break-before: always;">
+<%include file="weisskoff_mod.html" />
+</div>
+<div style = "display:block; clear:both; page-break-before: always;">
+<%include file="weisskoff_mod2.html" />
+</div>

@@ -1,0 +1,9 @@
+nibabel
+nipype
+dicom
+pandas
+numpy
+seaborn
+matplotlib
+mako
+pdfkit
