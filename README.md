@@ -14,9 +14,12 @@ current performance into the context of normal operation.
 
 ## Requirements
 
-Stabilitycalc checks for some of its requirements before running. In general,
+<p>Stabilitycalc checks for some of its requirements before running. In general,
 it requires a standard numpy/scipy/matplotlib environment, as well as
-`nibabel`, `nipype`, `dicom`, `pandas`, `seaborn`, `pdfkit` and `mako`.
+`nibabel`, `nipype`, `dicom`, `pandas`, `seaborn`, `pdfkit` and `mako`.</p>
+<p><b>NB</b>: pdfkit may request `wkhtmltopdf` tool to work correctly. If the PDF report
+file is not generated, install <a href="https://wkhtmltopdf.org/downloads.html" target="_blank">wkhtmltopdf</a> 
+and copy the installation folder inside the path_git_folder/script folder</p>
 
 ## How to use
 
