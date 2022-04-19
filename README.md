@@ -31,6 +31,7 @@ it requires a standard numpy/scipy/matplotlib environment, as well as
 
 4) Launch command:
 
+		cd path path_git_folder/script
 		python path_git_folder/script/stabilitycalc.py path_to_output path_to_input_folder 1 0
 
 ## INPUT
