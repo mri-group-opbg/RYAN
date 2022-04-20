@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-import glob
 import shutil
 import os
 from os.path import join as pjoin
-from os.path import exists, split, splitext
+from os.path import exists
 import time
 
-import matplotlib
 import seaborn
 seaborn.set_style("dark")
-# matplotlib.use('Agg', warn=False)
 import numpy as np
 import matplotlib.pyplot as plt
 import shutil
@@ -19,21 +16,25 @@ import nibabel as nib
 from mako.lookup import TemplateLookup
 makolookup = TemplateLookup(directories=['./tpl'])
 
-import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.getLogger('matplotlib.font_manager').disabled = True
-logging.getLogger('matplotlib').setLevel(logging.WARNING)
 import stabilityfuncs as sf
 import studyinfo
 import spike as spk
 import shimmingcalc as shm
-import PIL
-from PIL import Image as img
 
 import pdfkit
+from pathlib import Path
 
+import logging
+logging.basicConfig(
+    format='%(asctime)s.%(msecs)03d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S'
+    )
+logging.getLogger('matplotlib').setLevel(logging.ERROR)
 
-def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=None, noshimmingfilename=None, initxcenter=None, initycenter=None, initzcenter=None):
+import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore")
+
+def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimmingfilename=None, noshimmingfilename=None, initxcenter=None, initycenter=None, initzcenter=None):
 
     '''
         stabilitycalc
@@ -45,7 +46,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                 - shimming file (if used) should contain "shimming" in its name 
                 - no shimming file (if used) should contain "no_shimming" in its name
             3) Launch command:
-                ex. -> stabilitycalc("outputpath", "dicompath", 1, 0, "shimmingfile.nii", "noshimmingfile.nii", ...)
+                ex. -> stabilitycalc("output_path", "dicom_path", 1, 0, "wkhtmltopdf_path" "shimmingfile.nii", "noshimmingfile.nii", ...)
 
         A folder will be create inside output path selected (dirname) where result of computation will be stored:
             - images (.png)
@@ -61,6 +62,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
             - sliceshift: shift from center axial slice (int)
 
         OPTIONAL INPUTS:
+            - wkh (optional): path to wkhtmltopdf installation (string)
             - shimmingfilename (optional): name of shimming file nii (string)
             - noshimmingfilename (optional): name of no-shimming file nii (string)
             - initxcenter (optional): xcenter (int)
@@ -69,7 +71,21 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
 
     '''
     
-    logging.debug("Preparing inputs...")
+    logging.debug("Searching for wkhtmltopdf installation...")
+    if wkh==None:
+        home = str(Path.home())
+        wkh=sf.find_files("wkhtmltopdf.exe", home)
+    else:
+        wkh=sf.find_files("wkhtmltopdf.exe", wkh)
+    
+    if wkh=="":
+        wkh=None
+        logging.debug(
+            "WARNING: no wkhtmltopdf installation found! This could cause problem to the PDF report creation!"
+            )
+    else: logging.debug("wkhtmltopdf.exe find at %s\n" %wkh)
+
+    logging.debug("\nPreparing inputs...\n")
 
     if (not os.path.exists(dirname)):
         os.mkdir(dirname)
@@ -81,12 +97,13 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
     for filename, dicomfilename in zip(filenames, dicomfilenames):
         """create the stability report for a scan"""
 
-        logging.debug('dirname: {}\n'
-                    'filename: {}\n'
-                    'dicomfilename: {}\n'
-                    'starttime: {}\n'
-                    'sliceshift: {}\n'
-                    'centers: {}, {}, {}'.format(dirname, filename, dicomfilename, starttime, sliceshift, initxcenter, initycenter, initzcenter))
+        logging.debug('\n- dirname: {}\n'
+                    '- filename: {}\n'
+                    '- dicomfilename: {}\n'
+                    '- starttime: {}\n'
+                    '- sliceshift: {}\n'
+                    '- wkhtmltopdf: {}\n'
+                    '- centers: {}, {}, {}\n'.format(dirname, filename, dicomfilename, starttime, sliceshift, wkh, initxcenter, initycenter, initzcenter))
 
 
         isindividualcoil = False
@@ -114,7 +131,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                 sdshape = selecteddata.shape
                 selecteddata = selecteddata.reshape(sdshape[0], sdshape[1], 1, sdshape[2]).transpose(3, 2, 1, 0)
             elif sdshape2 < 100:
-                raise ValueError("Not Enough Data for Stability Assessment")
+                raise ValueError("Not Enough Data for Stability Assessment (check input data!)")
 
         numtimepoints = selecteddata.shape[0]
 
@@ -141,15 +158,11 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                 tr = info['RepetitionTime']
                 tr = tr/1000
 
-        #respath = os.path.dirname(os.path.abspath(filename))
         splitfile = os.path.split(filename)
-        # resultname = dicompath.split("/")[-1] if dicompath.split("/")[-1] != "" else dicompath.split("/")[-2]
-        # resultname = splitfile[0]
         
-        # make results directory
+        # create results directory
         data = day + "_" + month + "_" + year
         procresult_name = "procresults_" + info["IRCCS"].replace(" ", "_") + "_" + data + sf.directedfrom(splitfile[1])
-        #procresult_name = 'procresults_' + splitfile[1] + "_" + os.path.splitext(os.path.split(filename)[1])[0]
 
         shutil.rmtree(pjoin(dirname, procresult_name ), ignore_errors=True)
         if not exists(pjoin(dirname, procresult_name)):
@@ -161,7 +174,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         folderpath = os.getcwd()
         pngfile = folderpath + '/opbglogo1.png'
         destination = dirname + '/' + procresult_name
-        print (pngfile) 
+         
         shutil.copy(pngfile, destination)
 
         #############################
@@ -169,7 +182,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         #  Calculate various statistical images
         #
         # calculate the mean, stddev, variance and ptp images
-        logging.debug("calculating mean, stddev, and variance...")
+        logging.debug("Calculating mean, stddev, and variance...")
         meanslice = np.mean(selecteddata, 0)
         stddevslice = np.std(selecteddata, 0)
         varslice = np.var(selecteddata, 0)
@@ -184,7 +197,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         else:
             objectmask = sf.makemask(meanslice, 0.01 * threshmean, 1)
 
-        logging.debug("calculating normalized standard deviation and sfnr...")
+        logging.debug("Calculating normalized standard deviation and sfnr...")
         with np.errstate(invalid='ignore'):
             normstdslice = objectmask * np.nan_to_num(100.0 * stddevslice / meanslice)
             minstddev = sf.nzrobust(objectmask * meanslice)[1] / 5000.0
@@ -236,7 +249,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                             objectmask[k, j, i] = 1.0
             xcenter, ycenter, zcenter = [int(round(x)) for x in (xcenterf, ycenterf, zcenterf)]
 
-        logging.debug('coil: {}\n'.format(info['Coil'])) 
+        logging.debug('Coil: {}\n'.format(info['Coil'])) 
         # define the canonical limits
         #limits = sf.getlimits(info['Coil'])
         limits = sf.getlimits('32Ch_Head')
@@ -252,13 +265,13 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         birn_phantom_shapecheck = sf.limitcheck(object_shape, limits['BIRNphantom_shape'])
         if (birn_phantom_radiuscheck < 2) and (birn_phantom_shapecheck < 2):
             objectname = "BIRN phantom"
-            logging.debug("setting objectname to BIRN phantom")
+            logging.debug("Setting objectname to BIRN phantom")
     
         head_radiuscheck = sf.limitcheck(object_radius_mm, limits['head_rad'])
         head_shapecheck = sf.limitcheck(object_shape, limits['head_shape'])
         if (head_radiuscheck < 2) or (head_shapecheck < 2):
             objectname = "Head"
-            logging.debug("setting objectname to Head")
+            logging.debug("Setting objectname to Head")
     
 
         is_birn_sequence = True
@@ -280,7 +293,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         #
         #       Odd-even SNR - Modified to match BIRN
         #
-        logging.debug("calculating even/odd snr...")
+        logging.debug("Calculating even/odd snr...")
 
         evenims = selecteddata[0::2]
         oddims = selecteddata[1::2]
@@ -375,12 +388,12 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                 sf.markroi(centralroi, zcenter, roislice, 0.92 * rawmeanmax)
             centtc = sf.getroimeantc(selecteddata, centralroi, zcenter)
 
-            ###new SNR eval - chiara
-            centval = sf.getroival(meanslice, centralroi, zcenter) #valore medio ROI
-            selecteddatadiff = selecteddata.copy() #crea copia di selecteddata
+            ### new SNR eval
+            centval = sf.getroival(meanslice, centralroi, zcenter) # ROI mean value
+            selecteddatadiff = selecteddata.copy() 
             diffslice = np.mean(selecteddatadiff, 0)
-            diffslice [zcenter, :, :] = diffslice[zcenter, :, :] - diffslice[zcenter-1, :, :] #slice centrale - slice precedente
-            sigmad = sf.getroistd(diffslice, centralroi, zcenter) #deviazione standard 
+            diffslice [zcenter, :, :] = diffslice[zcenter, :, :] - diffslice[zcenter-1, :, :] #central slice - previous slice
+            sigmad = sf.getroistd(diffslice, centralroi, zcenter) # standard deviation 
             centsnrnew = 1.41 * (centval / sigmad) #new SNR
         
             cornertc_new = sf.check_zeros_corner(cornertc)
@@ -450,7 +463,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                     elementmaxpos = (origslicecenter[0] + newmaxlocoffsetscl * elementdirvec[0],
                                     origslicecenter[1] + newmaxlocoffsetscl * elementdirvec[1],
                                     origslicecenter[2] + newmaxlocoffsetscl * elementdirvec[2])
-                    logging.debug("maxpos adjusted to fall within valid image region")
+                    logging.debug("-> Maxpos adjusted to fall within valid image region")
                     
 
                 if elementmaxpos[2] < 0:
@@ -458,7 +471,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                     elementmaxpos = (origslicecenter[0] + newmaxlocoffsetscl * elementdirvec[0],
                                     origslicecenter[1] + newmaxlocoffsetscl * elementdirvec[1],
                                     origslicecenter[2] + newmaxlocoffsetscl * elementdirvec[2])
-                    logging.debug("maxpos adjusted to fall within valid image region")
+                    logging.debug("-> Maxpos adjusted to fall within valid image region")
                     
                 maxloccenterx, maxloccentery, maxloccenterz = [int(round(x)) for x in elementmaxpos[:3]]
                 maxlocroi = sf.setroilims(maxloccenterx, maxloccentery, maxlocroisize)
@@ -531,7 +544,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
                 for i, ele in enumerate(coildata):
                     if selecteddata.shape[1] == 1 and coildata[ele]['zloc'] != 0:
                         # single slice
-                        logging.debug('single slice data, changing zloc from {} to 0'.format(coildata[ele]['zloc']))
+                        logging.debug('\nSingle slice data, changing zloc from {} to 0'.format(coildata[ele]['zloc']))
                         
                         coildata[ele]['zloc'] = 0
                     roi = sf.setroilims(round(coildata[ele]['xloc']), round(coildata[ele]['yloc']), phasedarraysize)
@@ -674,7 +687,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
             periphang_sfnr_ptp = np.ptp(periphangsfnrs)
             periphang_sfnr_pp_qualitytag = qualitypercent(periphang_sfnr_ptp, meanangperiphsfnr, 'peripheral_angle_SFNR_p-p%')
         
-        except: pass
+        except: logging.debug('Something went wrong in peripheral ROIs analysis!'); pass
 
         #############################
         #
@@ -725,11 +738,13 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
             numslice = indexslice + 1
             (spikemeants, peaks_ts, peaks_nspk, peaks_slices) = spk.SpikeDetection(selecteddata)
 
-            if (peaks_nspk.sum() > 0): #se c'è almeno uno spike
+            if (peaks_nspk.sum() >= 0): # check if there is at least one spike
                 isspike = True
-                truepeaksslices = peaks_slices[peaks_nspk != 0]
+                truepeaksslices = peaks_slices[peaks_nspk >= 0.1]
+                logging.debug('Spikes detected!\n')
+            else: logging.debug("No spikes detected!\n")
 
-        except: spikeok = False
+        except: spikeok = False; logging.debug("Something went wrong with CBIrobustfit!\n")
 
 
         #############################
@@ -737,15 +752,17 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         # Shimming Analysis (01/08/2018)
         #
         logging.debug("Analyzing shimming...")
-        isshimming = 0
+        isshimming = False
         
         try:
             if shimmingfilename is not None:
-                isshimming = 1
+                isshimming = True
                 (PixDiffShimming, numPixDiffShimming) = shm.Shimming(dirname, shimmingfilename, 0, 10) 
                 (PixDiffNOShimming, numPixDiffNOShimming) = shm.Shimming(dirname, noshimmingfilename, 0, 10)
                 ShimmingRatio = float(numPixDiffShimming)/float(numPixDiffNOShimming) 
-        except: isshimming = False         
+            else: logging.debug("Shimmings file missing: final report won't have shimming images!\n")
+        
+        except: isshimming = False; logging.debug("Something went wrong: check shimming and no-shimming input! Final report won't have shimming images \n")        
 
 
         #############################
@@ -755,7 +772,8 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
 
         # statistical images section
 
-        
+        logging.debug("Generating images...")
+
         # noinspection PyShadowingNames
         def slicepic(inputslice, caption, minp, maxp, dirname, outputname, colormap):
             sf.showslice2(inputslice, caption, minp, maxp, colormap)
@@ -961,6 +979,8 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         #
         # Write summary text file and report
 
+        logging.debug("Generating report...\n")
+
         try:
             tpl = makolookup.get_template('analysissummary_mod.txt')
             summaryfile = pjoin(dirname, procresult_name, 'analysissummary.txt')
@@ -976,13 +996,13 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift, shimmingfilename=No
         #
         # Conversion to PDF
 
+        dirhtml = pjoin(pjoin(dirname, procresult_name),"output.html")
+        dirpdf = pjoin(pjoin(dirname, procresult_name),"output.pdf")
         try:
-            dirhtml = pjoin(dirname, procresult_name) + "/output.html"
-            dirpdf = pjoin(dirname, procresult_name) + "/output.pdf"
-            config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+            config = pdfkit.configuration(wkhtmltopdf=wkh)
             wkhtmltopdf_options = {"enable-local-file-access": None}
             pdfkit.from_url(dirhtml, dirpdf, options = wkhtmltopdf_options, configuration=config)
-        except:raise Exception("Error extracting PDF")
+        except: raise Exception("Error creating PDF file: check if wkhtmltopdf is installed correctly!")
 
 
 if __name__ == '__main__':
@@ -994,19 +1014,20 @@ if __name__ == '__main__':
     parser.add_argument('starttime', help='the number of tr periods to skip at the beginning of the file')
     parser.add_argument('sliceshift', help='number of slice to shift for center slice analysis without artefacts by BottiLuc')
 
-    com = parser.add_argument_group('use this location as the center of mass of the phantom')
-    com.add_argument('shimmingfilename', nargs='?', metavar='shimmingfilename')
-    com.add_argument('noshimmingfilename', nargs='?', metavar='noshimmingfilename')
-    com.add_argument('initxcenter', nargs='?', metavar='xcenter')
-    com.add_argument('initycenter', nargs='?', metavar='ycenter')
-    com.add_argument('initzcenter', nargs='?', metavar='zcenter')
+    com = parser.add_argument_group('optional inputs')
+    com.add_argument('wkh', nargs='?', metavar='wkh', help='path to wkhtmltopdf installation folder: if not given the program will search for it inside the computer')
+    com.add_argument('shimmingfilename', nargs='?', metavar='shimmingfilename',  help='path to shimming nifti acquisition')
+    com.add_argument('noshimmingfilename', nargs='?', metavar='noshimmingfilename', help='path to no-shimming nifti acquisition')
+    com.add_argument('initxcenter', nargs='?', metavar='xcenter', help='phantom x-center')
+    com.add_argument('initycenter', nargs='?', metavar='ycenter', help='phantom y-center')
+    com.add_argument('initzcenter', nargs='?', metavar='zcenter', help='phantom z-center')
 
     args = parser.parse_args()
     if None in (args.initxcenter, args.initycenter,
                 args.initzcenter) and not args.initxcenter == args.initycenter == args.initzcenter:
         parser.error('If you set one center of mass parameter, you must set all three.')
 
-    stabilitycalc(args.dirname, args.dicomfilename, int(args.starttime), int(args.sliceshift), args.shimmingfilename, args.noshimmingfilename, args.initxcenter, args.initycenter,
+    stabilitycalc(args.dirname, args.dicomfilename, int(args.starttime), int(args.sliceshift), args.wkh, args.shimmingfilename, args.noshimmingfilename, args.initxcenter, args.initycenter,
                 args.initzcenter)
 
 

@@ -1,8 +1,7 @@
-import matplotlib
 import seaborn
 seaborn.set_style("dark")
-# matplotlib.use('Agg', warn=False)
 import numpy as np
+np.seterr(all='raise')
 from numpy.linalg import inv
 from mako.lookup import TemplateLookup
 makolookup = TemplateLookup(directories=['./tpl'])
@@ -36,7 +35,9 @@ def CBIrobustfit(X,y):
         w = np.zeros(e.shape)
         ae = abs(e)
         index_inside = (ae<=k).nonzero()
-        w[index_inside,0] = np.power((1-np.power((e[index_inside,0]/k),2)),2)
+        try:
+            w[index_inside,0] = np.power((1-np.power((e[index_inside,0]/k),2)),2)
+        except: continue
     
         # Check for convergence:
         if (i > 2) and (abs(myErr[i-1,0] - myErr[i,0]) < myTolerance * myErr[i,0]):

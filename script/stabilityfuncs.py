@@ -1,8 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python -W
 
 """stabilityfuncs.py: provides general helper functions, especially for stabilitycalc"""
 import pkg_resources
 from distutils.version import LooseVersion
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def ASSERTVERSION(module, minver):
     # check requirements
@@ -20,13 +23,19 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as colors
-import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
 from collections import namedtuple
 import configparser
 import copy 
-from os.path import join, exists, splitext, isdir, split, isfile
-from os import makedirs, listdir, walk, rename 
+from os.path import join, exists, isdir, isfile
+from os import listdir, walk 
+
+import logging
+logging.basicConfig(
+    format='%(asctime)s.%(msecs)03d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S'
+    )
+logging.getLogger('matplotlib').setLevel(logging.ERROR)
+
 
 Stats = namedtuple('Stats', 'mean stddev var max min ptp')
 
@@ -214,16 +223,16 @@ def showtc2(thexvals, theyvals, thefitvals, thelabel, thexlabel= None):
 
 def showweisskoff(theareas, thestddevs, theprojstddevs, thelabel):
     # initialize and show a loglog Weiskoff plot
-    logging.debug("Generating plot for {}".format(thelabel))
+    logging.debug("\nGenerating plot for {}".format(thelabel))
     w, h = plt.figaspect(1.0)
     roiplot = plt.figure(figsize=(w, h))
     roiplot.subplots_adjust(hspace=0.35)
     roisubplot = roiplot.add_subplot(111)
     thestddevs += 0.00000001
-    roisubplot.loglog(theareas, thestddevs, 'r', theareas, theprojstddevs, 'k', basex=10)
+    roisubplot.loglog(theareas, thestddevs, 'r', theareas, theprojstddevs, 'k')
     roisubplot.grid(True)
 
-def showweisskoff2(theareas, thestddevs, theprojstddevs, thelabel, title): #chiara
+def showweisskoff2(theareas, thestddevs, theprojstddevs, thelabel, title): 
     # initialize and show a loglog Weiskoff plot
     logging.debug("Generating plot for {}".format(thelabel))
     w, h = plt.figaspect(1.0)
@@ -232,11 +241,11 @@ def showweisskoff2(theareas, thestddevs, theprojstddevs, thelabel, title): #chia
     roisubplot = roiplot.add_subplot(111)
     thestddevs += 0.00000001
     roisubplot.set_title(title)
-    roisubplot.loglog(theareas, thestddevs, 'r', theareas, theprojstddevs, 'k', basex=10)
+    roisubplot.loglog(theareas, thestddevs, 'r', theareas, theprojstddevs, 'k')
     roisubplot.grid(True)
 
 
-def showimage(data, thetitle, thexvals, theyvals, thelabel):  #MartiLuc
+def showimage(data, thetitle, thexvals, theyvals, thelabel): 
     logging.debug("Generating plot for {}".format(thelabel))
     w, h = plt.figaspect(0.5)
     roiplot = plt.figure(figsize=(w, h))
@@ -245,26 +254,27 @@ def showimage(data, thetitle, thexvals, theyvals, thelabel):  #MartiLuc
     plt.xlabel(thexvals)
     plt.ylabel(theyvals)
 
-def showimage_mod(data, thexvals, theyvals, thelabel, spikeslice):  #chiara
+def showimage_mod(data, thexvals, theyvals, thelabel, spikeslice): 
     logging.debug("Generating plot for {}".format(thelabel))
     w, h = plt.figaspect(0.5)
     spikeplot = plt.figure(figsize=(w, h))
     for i in range(len(spikeslice)): 
         spikesubplot = spikeplot.add_subplot(len(spikeslice),1,i+1)
         spikesubplot.plot(data[:,i])
-        spikesubplot.set_title("Slice %d" %spikeslice[i])
-        spikesubplot.set_xlabel(thexvals)
-        spikesubplot.set_ylabel(theyvals)
+        spikesubplot.tick_params(axis='both', which='major', labelsize=8)
+        spikesubplot.set_ylabel("Slice %d" %spikeslice[i], fontsize=8)
         plt.subplots_adjust(hspace = 1)
+    spikeplot.supxlabel(thexvals)
+    spikeplot.supylabel(theyvals)
 
-def showimage2(data, thetitle, thelabel): #MartiLuc
+def showimage2(data, thetitle, thelabel):
     logging.debug("Generating plot for {}".format(thelabel))
     w, h = plt.figaspect(1.0)
     roiplot = plt.figure(figsize=(w, h))
     plt.imshow(data)
     plt.title(thetitle)
 
-def showimage3(data, angle, thetitle): #MartiLuc
+def showimage3(data, angle, thetitle): 
     fig = plt.figure(figsize=(60, 60))
     index = np.arange(9)
     for i in index:
@@ -282,7 +292,7 @@ def showimage3(data, angle, thetitle): #MartiLuc
          plt.yticks([ymax,ymax], fontsize=40, rotation = 'vertical')
     plt.title(thetitle)
     
-def showimageangle(thexvals, angle, data, thefitvals, detrendingvals, i): #MartiLuc
+def showimageangle(thexvals, angle, data, thefitvals, detrendingvals, i):
   
     w, h = plt.figaspect(0.75)
     roiplot = plt.figure(figsize=(w, h))
@@ -305,7 +315,7 @@ def check_zeros_corner(thevec):
      thevec_check = copy.deepcopy(thevec)
      for i in index:
          if thevec[i] == 0:
-	    # MartiLuc quando thevec(198)=0 aggiorna theveccheck con il valore di thevec(199), che pero non esiste 
+	    # if thevec(198)=0 set theveccheck=thevec(199) 
             if l<198:
                thevec_check[i] = (thevec[i-1]+ thevec[i+1])*0.5 
             else:
@@ -315,6 +325,10 @@ def check_zeros_corner(thevec):
 
 def showslice2(thedata, thelabel, minval, maxval, colormap):
     # initialize and show a 2D slice from a dataset in greyscale
+
+    pil_logger = logging.getLogger('PIL')
+    pil_logger.setLevel(logging.INFO)
+
     plt.figure(figsize=plt.figaspect(1.0))
     theshape = thedata.shape
     numslices = theshape[0]
@@ -347,6 +361,10 @@ def showslice2(thedata, thelabel, minval, maxval, colormap):
 
 def showslice3(thedata, thelabel, minval, maxval, colormap):
     # initialize and show a 2D slice from a dataset in greyscale
+
+    pil_logger = logging.getLogger('PIL')
+    pil_logger.setLevel(logging.INFO)
+
     theshape = thedata.shape
     ysize = theshape[0]
     xsize = theshape[1]
@@ -517,7 +535,7 @@ def setroilims(xpos, ypos, size):
         return (((int(round(xpos - halfsize)), int(round(ypos - halfsize))),
                  (int(round(xpos + halfsize + 1)), int(round(ypos + halfsize + 1)))))
 
-def set3Droilims(xpos, ypos, zpos, size): #chiara
+def set3Droilims(xpos, ypos, zpos, size):
     # given a location and a size, define the corners of an 3D roi
     if (size % 2) == 0:
         halfsize = size / 2
@@ -599,7 +617,7 @@ def getroimeantc(theimage, theroi, zpos):
         themeans[i] = np.mean(np.ravel(thesubreg[i, :, :]))
     return themeans
 
-def get3Droimeantc(theimage, theroi): #chiara
+def get3Droimeantc(theimage, theroi): 
     # get an average timecourse from the voxels of an roi
     xstart = theroi[0][0]
     xend = theroi[1][0]
@@ -625,7 +643,7 @@ def getroival(theimage, theroi, zpos):
     theroival = np.mean(theimage[zpos, ystart:yend, xstart:xend])
     return theroival
 
-def getroistd(theimage, theroi, zpos): #chiara
+def getroistd(theimage, theroi, zpos):
     # get the standard deviation of an roi in a 3D image
     xstart = theroi[0][0]
     xend = theroi[1][0]
@@ -634,9 +652,11 @@ def getroistd(theimage, theroi, zpos): #chiara
     theroistd = np.std(theimage[zpos, ystart:yend, xstart:xend])
     return theroistd
 
-def evalweisskoff(numrois, roisizes, timepoints, xcenter, ycenter, zcenter, theimage, direction = ""): #chiara
+def evalweisskoff(numrois, roisizes, timepoints, xcenter, ycenter, zcenter, theimage, direction = ""): 
     # Weisskoff analysis evaluation
     '''
+    This method evaluate Weiskoff RDCs for axial, coronal, sagittal directions and for 3D ROI
+    
     numrois: number of ROI to try analysis (int)
     roisizes: dimensions of ROI (range)
     timepoints: temporal vector (array 1D)
@@ -694,23 +714,37 @@ def qualitytag(thestring, thequality):
     colors = ('00ff00', 'ffff00', 'ff0000')
     return '<FONT COLOR="{}">{}</FONT>'.format(colors[thequality], thestring)
 
-def prepareinput(dicompath): #chiara
+def prepareinput(dicompath): 
+
+    '''
+    This method search for all the requested inputs file inside the acquisition folder
+
+    input:
+        dicompath: path of acquisition folder
+
+    output:
+        dicomfilename: dicom file path
+        filenames: nifti first acquisition path
+        shimming: nifti shimming acquisition path
+        noshimming: nifti no-shimming acquisition path
+
+    '''
     
     dicomfilename = ""
     niipath = join(dicompath, "nii")
-    print(niipath)
+    
     if not exists(niipath):
         raise Exception("nii folder not found!")
 
     for folds in listdir(dicompath):
         if "nii" in folds: continue
         dicomfilename = selectdcmfilename(dicompath, folds)
-        dcmpath = join(dicompath, folds) 
+        # dcmpath = join(dicompath, folds) 
     return divideinput(niipath, dicomfilename)
 
 def selectdcmfilename(dicompath, folds):
     dicomfilename = []
-    if isfile(join(dicompath, folds)): return [join(dicompath, folds)] #and (folds.endswith(".IMA") or folds.endswith(".dcm")) 
+    if isfile(join(dicompath, folds)): return [join(dicompath, folds)]
     for i,pathfile in enumerate(listdir(join(dicompath, folds))):
         if folds.endswith(".ini"): continue
         if "loc" in pathfile or "Loc" in pathfile: continue
@@ -722,7 +756,7 @@ def selectdcmfilename(dicompath, folds):
                 dicomfilename.append(dicomtemp)
     return dicomfilename
 
-def searchfile(path, ext = None, allfile = False): #chiara
+def searchfile(path, ext = None, allfile = False): 
     
     if ext is not None:
         if listdir(path)[0].endswith(".IMA"): ext  = ".IMA"
@@ -741,7 +775,7 @@ def searchfile(path, ext = None, allfile = False): #chiara
                 return join(path, file) 
     
  
-def divideinput(path, dicomfilename): #chiara
+def divideinput(path, dicomfilename):
     filenames = []
     shimming = ""
     noshimming = ""
@@ -761,3 +795,11 @@ def directedfrom(filename):
     if any(word in filename for word in ap): return("_AP")
     elif any(word in filename for word in pa): return("_PA")
     else: return ""
+
+def find_files(filename, search_path):
+    result = ""
+    for root, dir, files in walk(search_path):
+        if filename in files:
+            result = join(root, filename)
+            break
+    return result
