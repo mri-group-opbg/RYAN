@@ -18,50 +18,68 @@ current performance into the context of normal operation.
 it requires a standard numpy/scipy/matplotlib environment, as well as
 `nibabel`, `nipype`, `dicom`, `pandas`, `seaborn`, `pdfkit` and `mako`.</p>
 <p><b>NB</b>: pdfkit may request `wkhtmltopdf` tool to work correctly. If the PDF report
-file is not generated, install <a href="https://wkhtmltopdf.org/downloads.html" target="_blank">wkhtmltopdf</a> 
-and copy the installation folder inside the path_git_folder/script folder</p>
+file is not generated, install <a href="https://wkhtmltopdf.org/downloads.html" target="_blank">wkhtmltopdf</a>. 
+The script will automatically serch inside the computer for the wkhtmltopdf folder: it is strongly recommended to give the wkhtmltopdf folder path as input to a faster script run</p>
+
 
 ## How to use
 
 1) Clone GitFolder
 
-2) Create an input folder and a subfolder named "nii". Copy one dicom acquisition file inside input folder and copy nifti files inside "nii" subfolder
+2) Create an input folder and a subfolder named "nii". Copy one dicom acquisition file inside input folder and copy nifti files inside "nii" subfolder.
+
+	<ins>Folder organization example</ins>:
+	* input folder
+		* nii
+			* first_acquisition.nii
+			* shimming.nii (optional)
+			* no-shimming.nii (optional)
+		* 001.dcm
 
 3) Check nifti files' names: 
 	- acquisition file should contain "acquisition" in its name
 	- shimming file (if used) should contain "shimming" in its name 
 	- no shimming file (if used) should contain "no_shimming" in its name
 
-4) Launch command:
-
+4) Launch stabilitycalc script: 
+	* with only required inputs:
+		```
 		cd path path_git_folder/script
 		python path_git_folder/script/stabilitycalc.py path_to_output path_to_input_folder 1 0
+		```
+		
+	* with required inputs and wkhtmltopdf path (<b><ins>strongly recommended</ins></b>):
+		```
+		cd path path_git_folder/script
+		python path_git_folder/script/stabilitycalc.py path_to_output path_to_input_folder 1 0 path_to_wkhtmltopdf_folder
+		```
 
 ## INPUT
 
-### REQUIREMENT INPUTS
+### REQUIRED INPUTS
 - dirname: output path to store results (path)
 - dicompath: path to find dicom file/s (path)
 - starttime: start time point to begin analysis (int)
 - sliceshift: shift from center axial slice (int)
 
 ### OPTIONAL INPUTS
-- shimmingfilename (optional): name of shimming file nii (string)
-- noshimmingfilename (optional): name of no-shimming file nii (string)
-- initxcenter (optional): xcenter (int)
-- initycenter (optional): ycenter (int)
-- initzcenter (optional): zcenter (int)
+- wkh: path to wkhtmltopdf installation (string)
+- shimmingfilename: name of shimming file nii (string)
+- noshimmingfilename: name of no-shimming file nii (string)
+- initxcenter: xcenter (int)
+- initycenter: ycenter (int)
+- initzcenter: zcenter (int)
 
 ## OUTPUT
 
 A folder will be create on the selected output path (dirname) and result of computation will be stored inside:
 
-- dirname:
-	- images (.png)
-	- analysissummary.txt
-	- dataquality.txt
-	- output.html 
-	- output.pdf
+* dirname
+	* images (.png)
+	* analysissummary.txt
+	* dataquality.txt
+	* output.html
+	* output.pdf
 
 
 
