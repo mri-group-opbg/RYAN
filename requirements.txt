@@ -1,9 +1,9 @@
-nibabel
+nibabel==2.0.0
 nipype
-dicom
+pydicom
 pandas
 numpy
-seaborn
+seaborn==0.5.1
 matplotlib
-mako
+mako==1.0.0
 pdfkit
