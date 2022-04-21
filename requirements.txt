@@ -4,6 +4,6 @@ pydicom
 pandas
 numpy
 seaborn>0.5.1
-matplotlib
+matplotlib>=3.5.1
 mako>1.0.0
 pdfkit

@@ -4,6 +4,7 @@ import shutil
 import os
 from os.path import join as pjoin
 from os.path import exists
+
 import time
 
 import seaborn
@@ -22,7 +23,6 @@ import spike as spk
 import shimmingcalc as shm
 
 import pdfkit
-from pathlib import Path
 
 import logging
 logging.basicConfig(
@@ -71,19 +71,15 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
 
     '''
     
+    print("\n")
+    print("#######################################################################################################")
+    print("#######################################################################################################")
+    print("####################################     STABILITY  EVALUATION     ####################################")
+    print("#######################################################################################################")
+    print("#######################################################################################################\n\n")
+
     logging.debug("Searching for wkhtmltopdf installation...")
-    if wkh==None:
-        home = str(Path.home())
-        wkh=sf.find_files("wkhtmltopdf.exe", home)
-    else:
-        wkh=sf.find_files("wkhtmltopdf.exe", wkh)
-    
-    if wkh=="":
-        wkh=None
-        logging.debug(
-            "WARNING: no wkhtmltopdf installation found! This could cause problem to the PDF report creation!"
-            )
-    else: logging.debug("wkhtmltopdf.exe find at %s\n" %wkh)
+    wkh=sf.wkhsearch(wkh)
 
     logging.debug("\nPreparing inputs...\n")
 
@@ -744,7 +740,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
                 logging.debug('Spikes detected!\n')
             else: logging.debug("No spikes detected!\n")
 
-        except: spikeok = False; logging.debug("Something went wrong with CBIrobustfit!\n")
+        except: spikeok = False; logging.debug("Analyzing spikes...Warning: CBIrobustfit failed!")
 
 
         #############################
@@ -861,11 +857,13 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
 
 
             # @formatter:on
-
-            for k in figs:
-                makefig(k)
         
         except:pass
+
+        for k in figs:
+            try:
+                makefig(k)
+            except: logging.debug("error creating %s: check matplotlib version (version >= 3.5.1 recommended) " %figs); continue
 
         try:
             # data quality report
@@ -973,24 +971,26 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
                 except KeyError:
                     pass
         
-        except:pass #raise Exception("Error generating dataquality file")
+        except: logging.debug("Error generating dataquality file!"); pass
 
         ########################################################
         #
-        # Write summary text file and report
+        # Write summary text file and html report
 
-        logging.debug("Generating report...\n")
+        logging.debug("Generating reports...\n")
 
         try:
             tpl = makolookup.get_template('analysissummary_mod.txt')
             summaryfile = pjoin(dirname, procresult_name, 'analysissummary.txt')
             with open(summaryfile, 'w') as fp:
                 fp.write(tpl.render(**locals()))
+        except: logging.debug("Error generating analysis summary!"); pass
 
+        try:
             tpl = makolookup.get_template('stability_mod.html')
             with open(pjoin(dirname, procresult_name, 'output.html'), 'w') as fp:
                 fp.write(tpl.render(**locals()))
-        except:pass #raise Exception("Error generating analysis summary or stability file")
+        except: raise Exception("Error generating output.html file!") 
 
         ########################################################
         #
@@ -1002,8 +1002,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
             config = pdfkit.configuration(wkhtmltopdf=wkh)
             wkhtmltopdf_options = {"enable-local-file-access": None}
             pdfkit.from_url(dirhtml, dirpdf, options = wkhtmltopdf_options, configuration=config)
-        except: raise Exception("Error creating PDF file: check if wkhtmltopdf is installed correctly!")
-
+        except: raise Exception("Error creating PDF file: check if PDF file is currently open! If not check if wkhtmltopdf is installed correctly!")
 
 if __name__ == '__main__':
     import argparse

@@ -28,7 +28,11 @@ from collections import namedtuple
 import configparser
 import copy 
 from os.path import join, exists, isdir, isfile
-from os import listdir, walk 
+from os import listdir, walk
+from pathlib import Path
+from sys import platform
+import subprocess
+
 
 import logging
 logging.basicConfig(
@@ -803,3 +807,27 @@ def find_files(filename, search_path):
             result = join(root, filename)
             break
     return result
+
+def wkhsearch(wkh):
+    #check if wkhtmltopdf is installed
+    #if system is windows
+    if wkh==None and platform.startswith('win'):
+        home = str(Path.home())
+        wkh=find_files("wkhtmltopdf.exe", home)
+    elif wkh!=None and platform.startswith('win'):
+        wkh=find_files("wkhtmltopdf.exe", wkh)
+
+    #if system is linux
+    elif wkh==None and platform.startswith('lin'):
+        wkh=subprocess.getoutput("whereis wkhtmltopdf")
+        wkh=wkh.split(" ")[1]
+    elif wkh!=None and platform.startswith('lin'):
+        wkh=find_files("wkhtmltopdf", wkh)
+    
+    if wkh=="":
+        wkh=None
+        logging.debug(
+            "WARNING: no wkhtmltopdf installation found! This could cause problem to the PDF report creation!"
+            )
+    else: logging.debug("wkhtmltopdf.exe find at %s\n" %wkh)
+    return(wkh)

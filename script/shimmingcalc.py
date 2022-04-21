@@ -2,16 +2,10 @@
 
 import os
 from os.path import join as pjoin
-import time
 
-import matplotlib
 import seaborn
 seaborn.set_style("dark")
-# matplotlib.use('Agg', warn=False)
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import shutil
 import nibabel as nib
 from mako.lookup import TemplateLookup
 makolookup = TemplateLookup(directories=['./tpl'])
@@ -22,7 +16,6 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 import shimmingfuncs as sh
 import stabilityfuncs as sf
-#from scipy import ndimage
 import scipy as sy
 import PIL
 from PIL import Image as img
@@ -95,7 +88,6 @@ def Shimming(dirname, filename, shift, radius):
     Ndiff = np.count_nonzero(diff == 1)   
 
     splitfile = os.path.splitext(os.path.basename(filename))
-    resultname = splitfile[0]
     diff1 = (2*mask - central_slice)
 
     return [diff1 , Ndiff]
@@ -112,9 +104,6 @@ if __name__ == '__main__':
     parser.add_argument('radius', help='radius by BOTTYLUC')
     
     args = parser.parse_args()
-
-    prova(args.dirname, args.filename, int(args.shift), int(args.radiust))
-
 
 
 

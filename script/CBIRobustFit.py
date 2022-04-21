@@ -9,9 +9,7 @@ import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 def CBIrobustfit(X,y):
-    # Initialize variables:
-    #y = np.matrix([[10], [2], [32], [42]])
-    #X = np.ones((4,1))
+    
     myTolerance = 10**-4
     max_iter = 50
 
@@ -28,7 +26,6 @@ def CBIrobustfit(X,y):
         b = np.matmul(inv(temp2), temp3)
         e = y - X * b
         temp4 = np.matmul(e.transpose(), W)
-        #print np.matmul(temp4, e)
         myErr[i,0] = np.matmul(temp4, e) 
         sigma = np.median(abs(e), axis=0) / 0.6745
         k = 4.685 * sigma
@@ -42,10 +39,5 @@ def CBIrobustfit(X,y):
         # Check for convergence:
         if (i > 2) and (abs(myErr[i-1,0] - myErr[i,0]) < myTolerance * myErr[i,0]):
             break
-    
-    #print w,b
-    return b
 
-#def spike_detection(spikes, corner1, corner2, meants)
-    
-    #return ts, nspk, slices, name
+    return b
