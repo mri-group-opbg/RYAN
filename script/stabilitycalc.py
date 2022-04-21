@@ -71,12 +71,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
 
     '''
     
-    print("\n")
-    print("#######################################################################################################")
-    print("#######################################################################################################")
-    print("####################################     STABILITY  EVALUATION     ####################################")
-    print("#######################################################################################################")
-    print("#######################################################################################################\n\n")
+    sf.printLogo()
 
     logging.debug("Searching for wkhtmltopdf installation...")
     wkh=sf.wkhsearch(wkh)
@@ -1003,6 +998,8 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
             wkhtmltopdf_options = {"enable-local-file-access": None}
             pdfkit.from_url(dirhtml, dirpdf, options = wkhtmltopdf_options, configuration=config)
         except: raise Exception("Error creating PDF file: check if PDF file is currently open! If not check if wkhtmltopdf is installed correctly!")
+
+        logging.debug("All Done!")
 
 if __name__ == '__main__':
     import argparse

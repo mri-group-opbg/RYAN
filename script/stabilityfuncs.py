@@ -28,7 +28,7 @@ from collections import namedtuple
 import configparser
 import copy 
 from os.path import join, exists, isdir, isfile
-from os import listdir, walk
+from os import listdir, walk, system
 from pathlib import Path
 from sys import platform
 import subprocess
@@ -831,3 +831,16 @@ def wkhsearch(wkh):
             )
     else: logging.debug("wkhtmltopdf.exe find at %s\n" %wkh)
     return(wkh)
+
+def printLogo():
+    system("clear")
+    print("""
+                         _       _   _   _
+            _           | |     |_| | | |_|   _
+     ___  _| |_   __ _  | |__    _  | |  _  _| |_ __  __
+    / __||_   _| / _' | |  _  \ | | | | | ||_   _|\ \/ /
+    \__ \  | |  \ (_| | | |_)  || | | | | |  | |   \  /
+    |___/  |_|   \__,_| |_____/ |_| |_| |_|  |_|   /_/      
+                                                    
+
+        """) 
