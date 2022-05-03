@@ -189,7 +189,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
             objectmask = sf.makemask(meanslice, 0.01 * threshmean, 1)
 
         logging.debug("Calculating normalized standard deviation and sfnr...")
-        with np.errstate(invalid='ignore'):
+        with np.errstate(divide='ignore', invalid='ignore'):
             normstdslice = objectmask * np.nan_to_num(100.0 * stddevslice / meanslice)
             minstddev = sf.nzrobust(objectmask * meanslice)[1] / 5000.0
             sfnrslice = np.where(objectmask * stddevslice > minstddev, meanslice / stddevslice, 0.0)
@@ -729,7 +729,7 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
             numslice = indexslice + 1
             (spikemeants, peaks_ts, peaks_nspk, peaks_slices) = spk.SpikeDetection(selecteddata)
 
-            if (peaks_nspk.sum() >= 0): # check if there is at least one spike
+            if (peaks_nspk.sum() > 0): # check if there is at least one spike
                 isspike = True
                 truepeaksslices = peaks_slices[peaks_nspk >= 0.1]
                 logging.debug('Spikes detected!\n')
@@ -1006,7 +1006,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Calculate stability values and create the output PDF and web page.')
     parser.add_argument('dirname', help='the output directory')
-    parser.add_argument('dicomfilename', help='the directory where DICOM files are stored')
+    parser.add_argument('dicomfilename', help='the directory where DICOM and nifti files are stored')
     parser.add_argument('starttime', help='the number of tr periods to skip at the beginning of the file')
     parser.add_argument('sliceshift', help='number of slice to shift for center slice analysis without artefacts by BottiLuc')
 
