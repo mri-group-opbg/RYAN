@@ -1,6 +1,6 @@
-# STABILITYCALC
+# RYAN - Rin stAbilitY quAlity coNtrol
 
-Stabilitycalc is a package we used to monitor the stability of fMRI system.  
+RYAN is a package we used to monitor the stability of fMRI system.  
 
 We use a version of the fBIRN procedure to run monthly phantom FUNSTAR quality 
 assurance tests.
@@ -14,7 +14,7 @@ current performance into the context of normal operation.
 
 ## Requirements
 
-<p>Stabilitycalc checks for some of its requirements before running. In general,
+<p>RYAN checks for some of its requirements before running. In general,
 it requires a standard numpy/scipy/matplotlib environment, as well as
 `nibabel`, `nipype`, `dicom`, `pandas`, `seaborn`, `pdfkit` and `mako`.</p>
 <p><b>NB</b>: pdfkit may request `wkhtmltopdf` tool to work correctly. If the PDF report
