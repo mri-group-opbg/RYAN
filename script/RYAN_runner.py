@@ -83,9 +83,12 @@ def stabilitycalc(dirname, dicompath, starttime, sliceshift,  wkh=None, shimming
   
     dicomfilenames, filenames, shimmingfilename, noshimmingfilename = sf.prepareinput(dicompath)
 
+    dicomfilename=dicomfilenames[0]
+
     if len(filenames) == 0: raise Exception("Error while converting files in nii format")
 
-    for filename, dicomfilename in zip(filenames, dicomfilenames):
+    # for filename, dicomfilename in zip(filenames, dicomfilenames):
+    for filename in filenames:
         """create the stability report for a scan"""
 
         logging.debug('\n- dirname: {}\n'
