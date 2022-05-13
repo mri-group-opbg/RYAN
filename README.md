@@ -41,7 +41,7 @@ The script will automatically serch inside the computer for the wkhtmltopdf fold
 	- shimming file (if used) should contain "shimming" in its name 
 	- no shimming file (if used) should contain "no_shimming" in its name
 
-4) Launch stabilitycalc script: 
+4) Launch RYAN_runner.py script: 
 	* with only required inputs:
 		```
 		cd path path_git_folder/script
