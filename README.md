@@ -45,13 +45,13 @@ The script will automatically serch inside the computer for the wkhtmltopdf fold
 	* with only required inputs:
 		```
 		cd path path_git_folder/script
-		python path_git_folder/script/RYAN_runner.py path_to_output path_to_input_folder 1 0
+		python script/RYAN_runner.py path_to_output path_to_input_folder 1 0
 		```
 		
 	* with required inputs and wkhtmltopdf path (<b><ins>strongly recommended</ins></b>):
 		```
 		cd path path_git_folder/script
-		python path_git_folder/script/RYAN_runner.py path_to_output path_to_input_folder 1 0 path_to_wkhtmltopdf_folder
+		python RYAN_runner.py path_to_output path_to_input_folder 1 0 path_to_wkhtmltopdf_folder
 		```
 
 ## INPUT
