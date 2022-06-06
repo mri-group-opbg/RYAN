@@ -16,7 +16,7 @@ import CBIRobustFit as CBIRF
 
 def SpikeDetection(theimage):
 
-    thold = 9
+    thold = 10
     spikesroisize = 5
     spikesxpos = int(int(spikesroisize / 2.0) + 1)
     spikesypos = int(int(spikesroisize / 2.0) + 1)

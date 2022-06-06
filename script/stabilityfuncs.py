@@ -23,6 +23,7 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as colors
+import matplotlib.ticker as ticker
 
 from collections import namedtuple
 import configparser
@@ -266,8 +267,11 @@ def showimage_mod(data, thexvals, theyvals, thelabel, spikeslice):
         spikesubplot = spikeplot.add_subplot(len(spikeslice),1,i+1)
         spikesubplot.plot(data[:,i])
         spikesubplot.tick_params(axis='both', which='major', labelsize=8)
-        spikesubplot.set_ylabel("Slice %d" %spikeslice[i], fontsize=8)
-        plt.subplots_adjust(hspace = 1)
+        spikesubplot.set_ylim(int(min(data[:,i]))-1, int(max(data[:,i]))+2)
+        spikesubplot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=1))
+        spikesubplot.set_ylabel("S %d" %spikeslice[i], fontsize=8, weight='bold')
+        spikeplot.subplots_adjust(hspace = 1)
+    
     spikeplot.supxlabel(thexvals)
     spikeplot.supylabel(theyvals)
 

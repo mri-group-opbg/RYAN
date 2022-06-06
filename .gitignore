@@ -1,2 +1,7 @@
 
 script/.vscode/launch.json
+script/main.py
+script/__pycache__/RYAN_runner.cpython-39.pyc
+script/__pycache__/spike.cpython-39.pyc
+script/__pycache__/stabilityfuncs.cpython-39.pyc
+script/__pycache__/spike.cpython-39.pyc
