@@ -263,11 +263,11 @@ def showimage_mod(data, thexvals, theyvals, thelabel, spikeslice):
     logging.debug("Generating plot for {}".format(thelabel))
     w, h = plt.figaspect(0.5)
     spikeplot = plt.figure(figsize=(w, h))
-    for i in range(len(spikeslice)): 
+    for i,s in enumerate(spikeslice): 
         spikesubplot = spikeplot.add_subplot(len(spikeslice),1,i+1)
-        spikesubplot.plot(data[:,i])
+        spikesubplot.plot(data[:,s])
         spikesubplot.tick_params(axis='both', which='major', labelsize=8)
-        spikesubplot.set_ylim(int(min(data[:,i]))-1, int(max(data[:,i]))+2)
+        spikesubplot.set_ylim(int(min(data[:,s]))-1, int(max(data[:,s]))+2)
         spikesubplot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=1))
         spikesubplot.set_ylabel("S %d" %spikeslice[i], fontsize=8, weight='bold')
         spikeplot.subplots_adjust(hspace = 1)
