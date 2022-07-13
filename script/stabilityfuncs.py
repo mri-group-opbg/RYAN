@@ -712,6 +712,7 @@ def evalweisskoff(numrois, roisizes, timepoints, xcenter, ycenter, zcenter, thei
             projstddevs[i - 1] = weissstddevs[0] / i**2
             projcvs[i - 1] = weisscvs[0] / i
         weissrdc = np.sqrt(weisscvs[0] / weisscvs[numrois - 1])
+        weissrdc = (weissrdc**2)**(2/3) 
 
     else:
         raise ValueError
